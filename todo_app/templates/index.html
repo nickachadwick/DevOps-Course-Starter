@@ -4,15 +4,42 @@
 {% block content %}
   <div class="jumbotron">
     <h1 class="display-4">To-Do App</h1>
-    <p class="lead">Just another to-do app.</p>
+    <FORM action="http://localhost:5000/add_todo_item" method="post">
+      <P>
+        <LABEL for="newitem">Add item: </LABEL>
+        <INPUT type="text" name="newitem" id="newitem">
+        <INPUT type="submit" value="submit"> <INPUT type="reset">
+      </P>
+   </FORM>
   </div>
 
+  
   <div class="row">
-    <div class="col-md-12">
-      <h2>Items</h2>
-      <ul class="list-group mb-4">
-        <!-- List the todo items here -->
-      </ul>
-    </div>
+    <table style="width:80%">
+      <tr>
+        <th>ID</th>
+        <th>Status</th>
+        <th>Item To-Do</th> 
+        <th>Completed</th>
+        <th>Delete Item</th>
+      </tr>
+       {% for item in items %}
+         <tr>
+          <td>{{ item.id }}</td>
+           <td>{{ item.status }}</td>
+           <td>{{ item.title }}</td> 
+           <td>
+             <FORM action="http://localhost:5000/completed?id={{ item.id }}" method="post">
+                <INPUT type="submit" value="Completed">
+             </FORM>
+           </td>
+           <td>
+            <FORM action="http://localhost:5000/delete?id={{ item.id }}" method="post">
+               <INPUT type="submit" value="delete">
+            </FORM>
+          </td>
+         </tr>
+       {% endfor %} 
+    </table>
   </div>
 {% endblock %}
