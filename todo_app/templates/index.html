@@ -20,14 +20,15 @@
         <th>ID</th>
         <th>Status</th>
         <th>Item To-Do</th> 
-        <th>Completed</th>
+        <th>Move To Next Status</th>
         <th>Delete Item</th>
       </tr>
        {% for item in items %}
-         <tr>
-          <td>{{ item.id }}</td>
+       
+        <tr>
+          <td>{{ item.idShort }}</td>
            <td>{{ item.status }}</td>
-           <td>{{ item.title }}</td> 
+           <td>{{ item.name }}</td> 
            <td>
              <FORM action="http://localhost:5000/completed?id={{ item.id }}" method="post">
                 <INPUT type="submit" value="Completed">
@@ -39,6 +40,7 @@
             </FORM>
           </td>
          </tr>
+        
        {% endfor %} 
     </table>
   </div>
