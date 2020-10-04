@@ -47,26 +47,37 @@ def add_card_to_list(card_name):
     new_card_parameters = {'key': Config.API_KEY,'token': Config.TOKEN, 'name': card_name, 'idList': card_starting_list}
     requests.post('https://api.trello.com/1/cards/', params = new_card_parameters)
 
-def update_card_list(card_id, new_idList):
-    update_card_parameters = {'key': Config.API_KEY,'token': Config.TOKEN, 'idList': new_idList}
-    requests.put('https://api.trello.com/1/cards/'+ card_id, params = update_card_parameters)
+def return_card_object(card_id):
+    get_target_card = requests.get('https://api.trello.com/1/cards/' + card_id, params = trello_authorisation)
+    get_target_card_json = get_target_card.json()
+    return get_target_card_json
 
-def delete_card(card_id):
-    requests.delete('https://api.trello.com/1/cards/'+ card_id, params = trello_authorisation)
+
+class item:
+    def __init__(self,idShort, card_name, card_id, list_id ):
+        self.idShort = idShort
+        self.card_id = card_id
+        self.card_name = card_name
+        self.status = get_status_name(card_id)
+        self.list_id = list_id
+        self.NextidList = get_next_list(list_id)
+
+    def delete_card(self):
+        requests.delete('https://api.trello.com/1/cards/'+ self.card_id, params = trello_authorisation)
+    
+    def update_card_list(self):
+        update_card_parameters = {'key': Config.API_KEY,'token': Config.TOKEN, 'idList': self.NextidList['id']}
+        requests.put('https://api.trello.com/1/cards/'+ self.card_id, params = update_card_parameters)
 
 @app.route('/')
 def index():
     cards_on_a_board = requests.get('https://api.trello.com/1/boards/' + Config.TRELLO_BOARD + '/cards', params = trello_authorisation)
-    cards_on_a_board_json = cards_on_a_board.json()
-        
+    cards_on_a_board_json = cards_on_a_board.json()        
+    my_card_instance = []
     for myitem in cards_on_a_board_json:
-        card_status_name = get_status_name(myitem["id"]) 
-        myitem["status"] = card_status_name
-        next_status_name = get_next_list(myitem["idList"]) 
-        myitem["nextstatus_name"] = next_status_name["name"]
-        myitem["nextstatus_id"] = next_status_name["id"]
-        
-    return render_template('index.html', items=cards_on_a_board_json)
+        my_card_instance.append(item(myitem["idShort"],myitem["name"],myitem["id"],myitem["idList"] ))
+  
+    return render_template('index.html', items=my_card_instance)
 
 @app.route('/add_todo_item', methods=['POST']) 
 def add_todo_item(): 
@@ -77,15 +88,18 @@ def add_todo_item():
 
 @app.route('/completed', methods=['POST']) 
 def completed(): 
-    completed_card_id = request.values.get('id')
-    next_idList = request.values.get('next_idList')
-    update_card_list(completed_card_id,next_idList )
+    target_card_id = request.values.get('id')
+    target_card = return_card_object(target_card_id) 
+    my_item = item(target_card["idShort"],target_card["name"],target_card_id,target_card["idList"])
+    my_item.update_card_list()
     return redirect('/')
 
 @app.route('/delete', methods=['POST']) 
 def delete(): 
     target_card_id = request.values.get('id')
-    delete_card(target_card_id)
+    target_card = return_card_object(target_card_id)    
+    my_item = item(target_card["idShort"],target_card["name"],target_card_id,target_card["idList"])
+    my_item.delete_card()
     return redirect('/')
 
 

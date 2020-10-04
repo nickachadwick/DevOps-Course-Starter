@@ -28,14 +28,14 @@
         <tr>
           <td>{{ item.idShort }}</td>
            <td>{{ item.status }}</td>
-           <td>{{ item.name }}</td> 
+           <td>{{ item.card_name }}</td> 
            <td>
-             <FORM action="http://localhost:5000/completed?id={{ item.id }}&next_idList={{ item.nextstatus_id }}" method="post">
-                <INPUT type="submit" value="{{ item.nextstatus_name }}">
+             <FORM action="http://localhost:5000/completed?id={{ item.card_id }}&next_idList={{ item.NextidList['id'] }}" method="post">
+                <INPUT type="submit" value="{{ item.NextidList['name'] }}">
              </FORM>
            </td>
            <td>
-            <FORM action="http://localhost:5000/delete?id={{ item.id }}" method="post">
+            <FORM action="http://localhost:5000/delete?id={{ item.card_id }}" method="post">
                <INPUT type="submit" value="delete">
             </FORM>
           </td>
