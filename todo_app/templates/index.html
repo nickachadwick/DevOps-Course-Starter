@@ -31,7 +31,7 @@
            <td>{{ item.name }}</td> 
            <td>
              <FORM action="http://localhost:5000/completed?id={{ item.id }}" method="post">
-                <INPUT type="submit" value="Completed">
+                <INPUT type="submit" value="{{ item.nextstatus }}">
              </FORM>
            </td>
            <td>
