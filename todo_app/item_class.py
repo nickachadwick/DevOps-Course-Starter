@@ -2,6 +2,7 @@ from todo_app.flask_config import Config
 from todo_app.list_class import list
 import requests
 import json
+import datetime
 
 trello_authorisation = {'key': Config.API_KEY,'token': Config.TOKEN}
 
@@ -54,8 +55,24 @@ def get_list_progress(list_id):
     get_next_list_dict = get_progress_list(list_id)
     return get_next_list_dict["progress"]
 
+def check_if_task_recently_completed(target_card):
+    currentDateFormatted = get_current_date()
+    lastActivityDate = format_card_last_activity_date(target_card["dateLastActivity"])
+    if lastActivityDate == currentDateFormatted:
+        return "recent"
+    else:
+        return "older"
+
+
+def get_current_date():
+    return datetime.datetime.today().strftime ('%d-%b-%Y')
+
+def format_card_last_activity_date(last_activity_date_string):
+    date_object = datetime.datetime.strptime(last_activity_date_string, '%Y-%m-%dT%H:%M:%S.%fZ')
+    return date_object.strftime ('%d-%b-%Y')
+
 class item:
-    def __init__(self,idShort, card_name, card_id, list_id, showToDoItems, showProgressingItems, showCompletedJobs ):
+    def __init__(self,idShort, card_name, card_id, list_id, showToDoItems, showProgressingItems, showCompletedJobs, showCompletedRadio ):
         self.idShort = idShort
         self.card_id = card_id
         self.card_name = card_name
@@ -65,6 +82,7 @@ class item:
         self.showItemsToDo = showToDoItems
         self.showProgressing = showProgressingItems
         self.showCompleted = showCompletedJobs
+        self.showCompletedRadio = showCompletedRadio
 
     def delete_card(self):
         requests.delete('https://api.trello.com/1/cards/'+ self.card_id, params = trello_authorisation)
@@ -72,5 +90,7 @@ class item:
     def update_card_list(self):
         update_card_parameters = {'key': Config.API_KEY,'token': Config.TOKEN, 'idList': self.progress['id']}
         requests.put('https://api.trello.com/1/cards/'+ self.card_id, params = update_card_parameters)
+
+
 
 
