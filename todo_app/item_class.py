@@ -34,10 +34,8 @@ def get_progress_list(list_id):
         if mylist["id"] == list_id:
             use_next_list_entry = True
             
-
         list_loop_iterations = list_loop_iterations + 1
-    
-    
+ 
     if list_loop_iterations != 1:
         card_progress = "inprogress"
 
