@@ -3,17 +3,61 @@
 
 {% block content %}
   <div class="jumbotron">
-    <h1 class="display-4">To-Do App</h1>
-    <FORM action="http://localhost:5000/add_todo_item" method="post">
+     <FORM action="http://localhost:5000/add_todo_item?todo_checkbox={{ items[0].showItemsToDo }}&progressing_checkbox={{ items[0].showProgressing }}&done_checkbox={{ items[0].showCompleted }}&doneitems={{ items[0].showCompletedRadio }}" method="post">
       <P>
         <LABEL for="newitem">Add item: </LABEL>
         <INPUT type="text" name="newitem" id="newitem">
         <INPUT type="submit" value="submit"> <INPUT type="reset">
       </P>
-   </FORM>
-  </div>
+       </FORM>
+      <FORM action="http://localhost:5000/filterResults"method="post">
+        <P>
+          <INPUT type="submit" value="filter"> 
+        <P>
+        {% if items[0].showItemsToDo == 'showToDoItemsTrue' %}
+            <input type="checkbox" id="todoJobs1" name="todoJobs1" value="showToDoItemsTrue" checked> show todo jobs
+        {% else %}
+            <input type="checkbox" id="todoJobs1" name="todoJobs1" value="showToDoItemsTrue"> show todo jobs 
+        {% endif %} 
+        </P>
+        <P>
+        {% if items[0].showProgressing == 'showProgressingItemsTrue' %}
+            <input type="checkbox" id="progressingJobs" name="progressingJobs" value="showProgressingItemsTrue" checked> show progressing jobs
+        {% else %}
+            <input type="checkbox" id="progressingJobs" name="progressingJobs" value="showProgressingItemsTrue" > show progressing jobs
+        {% endif %} 
+        </P>
+        <P>
+        {% if items[0].showCompleted == 'showCompletedJobsTrue' %}
+            <input type="checkbox" id="completedJobs" name="completedJobs" value="showCompletedJobsTrue" checked> show completed jobs:
 
-  
+            {% if items[0].showCompletedRadio == 'recent' %}
+              <input type="radio" id="recentdoneitems" name="doneitems"  value = "recent" checked> recently completed tasks
+            {% else %}
+              <input type="radio" id="recentdoneitems" name="doneitems"  value = "recent"> recently completed tasks
+            {% endif %}
+            {% if items[0].showCompletedRadio == 'older' %}
+              <input type="radio" id="olderdoneitems" name="doneitems"  value = "older" checked> older completed tasks 
+            {% else %}
+              <input type="radio" id="olderdoneitems" name="doneitems"  value = "older" > older completed tasks
+            {% endif %}  
+            {% if items[0].showCompletedRadio == 'all' %}
+              <input type="radio" id="alldoneitems" name="doneitems"  value = "all" checked> all completed tasks 
+            {% else %}
+              <input type="radio" id="alldoneitems" name="doneitems"  value = "all" > all completed tasks 
+            {% endif %}
+        {% else %}
+            <input type="checkbox" id="completedJobs" name="completedJobs" value="showCompletedJobsTrue" > show completed jobs
+        {% endif %} 
+        </P>
+        
+        </FORM>
+  </div>
+  {% if items[0].showCompletedRadio == 'xALL' %}
+    <P>=====================================================================================================</P>
+    <P>All filters had been switched on because no tasks were returned with the user's selected filters</p>
+    <P>=====================================================================================================</P>
+  {% endif %} 
   <div class="row">
     <table style="width:80%">
       <tr>
@@ -23,24 +67,79 @@
         <th>Move To Next Status</th>
         <th>Delete Item</th>
       </tr>
-       {% for item in items %}
-       
+      {% if items[0].showItemsToDo == 'showToDoItemsTrue' %}
+      <tr>
+        <th>Items to do</th>
+      </tr>
+      {% endif %}    
+          {% for item in items %}
+            {% if item.progress['progress'] == 'todo' %}
+              <tr>
+                <td>{{ item.idShort }}</td>
+                <td>{{ item.status }}</td>
+                <td>{{ item.card_name }}</td> 
+                <td>
+                  
+                  <FORM action="http://localhost:5000/next_list?id={{ item.card_id }}&next_idList={{ item.progress['id'] }}&todo_checkbox={{ item.showItemsToDo }}&progressing_checkbox={{ item.showProgressing }}&done_checkbox={{ item.showCompleted }}&doneitems={{ items[0].showCompletedRadio }}" method="post">
+                    <INPUT type="submit" value="{{ item.progress['name'] }}">
+                  </FORM>
+                    
+
+                </td>
+                <td>
+                  <FORM action="http://localhost:5000/delete?id={{ item.card_id }}&todo_checkbox={{ items[0].showItemsToDo }}&progressing_checkbox={{ item.showProgressing }}&done_checkbox={{ item.showCompleted }}&doneitems={{ items[0].showCompletedRadio }}" method="post">
+                    <INPUT type="submit" value="Delete">
+                  </FORM>
+                </td>
+              </tr>
+            {% endif %} 
+            {% endfor %} 
+        {% if items[0].showProgressing == 'showProgressingItemsTrue' %}    
+         <tr>
+          <th>Items that are in progress</th>
+        </tr>
+        {% endif %} 
         <tr>
+          {% for item in items %}
+          {% if item.progress['progress'] == 'inprogress' %}
           <td>{{ item.idShort }}</td>
            <td>{{ item.status }}</td>
            <td>{{ item.card_name }}</td> 
            <td>
-             <FORM action="http://localhost:5000/completed?id={{ item.card_id }}&next_idList={{ item.NextidList['id'] }}" method="post">
-                <INPUT type="submit" value="{{ item.NextidList['name'] }}">
-             </FORM>
+             
+               <FORM action="http://localhost:5000/next_list?id={{ item.card_id }}&next_idList={{ item.progress['id'] }}&todo_checkbox={{ items[0].showItemsToDo }}&progressing_checkbox={{item.showProgressing }}&done_checkbox={{item.showCompleted}}&doneitems={{ items[0].showCompletedRadio }}" method="post">
+                  <INPUT type="submit" value="{{ item.progress['name'] }}">
+                </FORM>
+               
+
            </td>
            <td>
-            <FORM action="http://localhost:5000/delete?id={{ item.card_id }}" method="post">
-               <INPUT type="submit" value="delete">
+            <FORM action="http://localhost:5000/delete?id={{ item.card_id }}&todo_checkbox={{ items[0].showItemsToDo }}&progressing_checkbox={{ item.showProgressing }}&done_checkbox={{ item.showCompleted }}&doneitems={{ items[0].showCompletedRadio }}" method="post">
+               <INPUT type="submit" value="Delete">
             </FORM>
           </td>
          </tr>
-        
+         {% endif %} 
+         {% endfor %}
+         {% if items[0].showCompleted == 'showCompletedJobsTrue' %}
+         <tr>
+          <th>Completed items</th>
+        </tr>
+        {% endif %}
+        {% for item in items %}
+        {% if item.progress['progress'] == 'done' %}
+         <tr>
+          <td>{{ item.idShort }}</td>
+           <td>{{ item.status }}</td>
+           <td>{{ item.card_name }}</td> 
+           <td> {{item.progress['progress']}}</td>
+           <td>
+            <FORM action="http://localhost:5000/delete?id={{ item.card_id }}&todo_checkbox={{ items[0].showItemsToDo }}&progressing_checkbox={{ item.showProgressing }}&done_checkbox={{ item.showCompleted }}&doneitems={{ items[0].showCompletedRadio }}" method="post">
+               <INPUT type="submit" value="Delete">
+            </FORM>
+          </td>
+         </tr>
+         {% endif %} 
        {% endfor %} 
     </table>
   </div>
