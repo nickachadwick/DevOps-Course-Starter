@@ -119,4 +119,5 @@ env/
 ### Configuration files ###
 .env
 
-
+##ignore the vagrant files
+.vagrant
